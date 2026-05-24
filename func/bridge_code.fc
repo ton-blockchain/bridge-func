@@ -23,7 +23,7 @@ builder store_fees(builder b, (int, int, int) fees) inline {
     set_data(st);
 }
 
-int calculate_fee(int msg_value, fees)  {
+int calculate_fee(int msg_value, fees) impure {
     (int flat_reward, int network_fee, int factor) = fees;
     int remain = msg_value - flat_reward - network_fee;
     throw_unless(400, remain > 0);
