@@ -116,6 +116,18 @@ _ unpack_owner_info(slice cs) inline_ref {
   return (cells, bits);
 }
 
+() try_init() impure inline_ref {
+  ;; first query without signatures is always accepted
+  (int wallet_id, int n, int k, int last_cleaned, cell owner_infos, cell pending_queries, int lock_until) = unpack_state();
+  throw_if(37, last_cleaned);
+  accept_message();
+  set_data(pack_state(pending_queries, owner_infos, 1, k, n, wallet_id, lock_until));
+}
+
+() recv_external() {
+  try_init();
+}
+
 () recv_internal(cell in_msg_cell, slice in_msg) impure {
   if (slice_empty?(in_msg)) {
     return (); ;; just assept TON
