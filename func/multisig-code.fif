@@ -12,6 +12,8 @@ PROGRAM{
   DECLPROC dec_flood
   DECLPROC update_pending_queries
   DECLPROC calc_boc_size
+  DECLPROC try_init
+  DECLPROC recv_external
   DECLPROC recv_internal
   104746 DECLMETHOD get_query_state
   117746 DECLMETHOD processed?
@@ -229,6 +231,23 @@ PROGRAM{
       calc_boc_size CALLDICT	//  root cells bits
     }>	//  root cells bits
     1 2 BLKDROP2	//  cells bits
+  }>
+  try_init PROCREF:<{
+    // 
+    unpack_state INLINECALLDICT	//  wallet_id n k last_cleaned owner_infos pending_queries lock_until
+    s0 s3 XCHG	//  wallet_id n k lock_until owner_infos pending_queries last_cleaned
+    37 THROWIF
+    ACCEPT
+    s4 s5 XCHG2
+    1 PUSHINT
+    s0 s4 XCHG
+    s0 s3 XCHG	//  pending_queries owner_infos _11=1 k n wallet_id lock_until
+    pack_state INLINECALLDICT	//  _12
+    c4 POP
+  }>
+  recv_external PROC:<{
+    // 
+    try_init INLINECALLDICT
   }>
   recv_internal PROC:<{
     //  in_msg_cell in_msg
